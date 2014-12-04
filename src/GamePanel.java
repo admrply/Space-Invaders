@@ -2,7 +2,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -35,9 +34,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-//TODO Add player shelters
-//TODO Comment the fuck out of everything!
-
 @SuppressWarnings("serial")
 public class GamePanel extends JPanel implements ActionListener, KeyListener{
 
@@ -46,8 +42,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 //	private Enemy enemy;
 	private ArrayList<Enemy> enemyList;
 	//This is where all of the enemies are stored. This list is modified by a series of iterators.
-	private ArrayList<Shelter> shelterList;
-	//This is where the player shelters are stored.
 	public static int score = 0;
 	//This score is made static so the enemy values can be easily added to it.
 	public static int gameHeight;
@@ -87,6 +81,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	//Above are the objects which assist in the reading and writing of files including serialisation.
 	
 	Font retro;
+	//Creates a reference font variable so that .deriveFont() can be used later.
 	
 	AudioInputStream ais;
 	Clip clip;
@@ -115,8 +110,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	public GamePanel(){
 		enemyList = new ArrayList<Enemy>();
 		//All enemies are stored in this array list and are written to/removed from with Iterators
-		shelterList = new ArrayList<Shelter>();
-		//All shelters are stored in this array
 		redrawTimer = new Timer(10, this);
 		//Refresh rate: 10ms
 		meteorTimer = new Timer(meteorRate, this);
@@ -176,13 +169,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		}
 		//Same as above however this time a timer stop isn't neccessary as they are drawn in a line
 		//so the alignment doesn't matter and isn't noticable at all.
-	}
-	
-	//This is to add the shelters
-	public void placeShelters(int width, int height){
-		for(int i=0;i<4;i++){
-			shelterList.add(new Shelter(width, height, i*(GamePanel.gameWidth/4)+75, GamePanel.gameHeight-110));
-		}
 	}
 
 	/** handles the timer event, this method repeats based on the interval set in the timer (10ms) **/ 
@@ -254,6 +240,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		//Info text:
 		retro = retro.deriveFont(50f);
 		g.setFont(retro);
+		//deriveFont method sets the size to 50px and then refreshes it with the setFont method
 		if(saved){
 			//If the game has just been saved...
 			g.drawString("Game saved!", 440, 450);
@@ -425,56 +412,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 					//the player will still survive because they'll only lose one life. If the enemy has
 					//the same amount of lives or more than the player, the player will die.
 				}
-				
-				Iterator<Shelter> shelterIterate = shelterList.iterator();
-				//Sets up an iterator for cycling through the enemyList
-				while (shelterIterate.hasNext()) {
-					//While there are still enemies left to move and draw
-					Shelter sh = shelterIterate.next();
-					//Set the temp enemy to be the next available enemy in the list
-					
-					/** Enemy Bullet-Shelter collision detection **/
-					if(e instanceof ShootBack){
-						//If the current enemy can shoot
-						for(int i=0; i<((ShootBack)e).getEnemyBulletCount();i++){
-							//For each of the active bullets the enemy has
-							if (((ShootBack)e).getBulletBounds(i).intersects(sh.getBounds())){
-								//Check if the bounds intersect the shelter bounds
-								if(sh.getNumberOfHits()==0){
-									//If there are currently no hits on the shelter
-									sh.hit(((ShootBack)e).getBulletPosition(i));
-									((ShootBack)e).getBullet(i).destroy();
-									//Add a hit point to the shelter and destroy the bullet
-								}
-								else{
-									//If there is at least one hit point
-									for(int noh=0;noh<sh.getNumberOfHits();noh++){
-										//For each of the hit points
-										Point theHit = sh.getHitCoord(noh);
-										if(!((ShootBack)e).getBulletBounds(i).contains(theHit.x, theHit.y, 10, 10)){
-											//Check if the bullet bounds do not contain the hit coordinate
-											Point cbp = ((ShootBack)e).getBulletPosition(i);
-											sh.hit(((ShootBack)e).getBulletPosition((i)-10));
-											((ShootBack)e).getBullet(i).destroy();
-											//If they don't, at a hit point and destroy the bullet
-										}
-									}
-								}
-							}
-						}
-						sh.draw(g);
-						sh.hitDraw(g);
-					}
-					/** Enemy-Shelter collision detection **/
-					if(e.getBounds().intersects(sh.getBounds())){
-						sh.destroy();
-						shelterIterate.remove();
-						e.destroy();
-					}
-					
-					sh.draw(g);
-				}
-				
 	
 				if(e!=null && e.isActive()){
 					//If the enemy exists and hasn't been killed...
@@ -557,27 +494,29 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		}
 	}
 	
+	/** This method starts the motherships sound and is called from the generics if statement above **/
 	private void playMothershipsSound(){
 		try {
 			ais = AudioSystem.getAudioInputStream(this.getClass().getResource("motherships.wav"));
 			clip = AudioSystem.getClip();
 			clip.open(ais);
 			clip.loop(-1);;
+			//Load the sound and loop it forever
 		} catch (UnsupportedAudioFileException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (LineUnavailableException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		mothershipSoundPlaying = true;
+		mothershipSoundPlaying=true;
+		//This lets the game know the sound is playing
 	}
 	
 	private void stopMothershipsSound(){
 		if(mothershipSoundPlaying){
+			//This prevents a null pointer if the player dies when there are no motherships on the
+			//screen as the clip will be unreferenced before this point.
 			clip.stop();
 		}
 	}
@@ -588,14 +527,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			Clip clip = AudioSystem.getClip();
 			clip.open(ais);
 			clip.start();
+			//Loads and plays the hit sound once
 		} catch (UnsupportedAudioFileException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (LineUnavailableException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -693,33 +630,36 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			}
 		}
 		boolean explosionPlayed = false;
+		//Because this method is active when the player is inactive, the explosion sound would contantly be trying
+		//to play and as such it will overlap, play on top of itself and ultimately crash the game.
+		//This explosionPlayed boolean makes sure it is only played once.
 		if(!explosionPlayed){
 			try {
 				AudioInputStream ais = AudioSystem.getAudioInputStream(this.getClass().getResource("explosion.wav"));
 				Clip clip = AudioSystem.getClip();
 				clip.open(ais);
 				clip.start();
+				//Plays the explosion sound once
 			} catch (UnsupportedAudioFileException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (LineUnavailableException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			explosionPlayed = true;
 		}
-		//Uncomment this to die.
-		//Commented to test.
 		stopMothershipsSound();
+		//Prevent mothership sound from still playing if they kill the player
 		meteorTimer.stop();
 		destroyerTimer.stop();
+		//Stop new specials from spawning
 		enemyList.removeAll(enemyList);
+		//Clear the screen
 		menuScreen = true;
 		gameDeath = true;
 		deathCount = deathCount+1;
+		//Go to the menu screen after gameDeath and show the deathCount
 	}
 	
 	/** Method to save the game **/
@@ -816,9 +756,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 				JOptionPane.showMessageDialog(null, "This is from an old version of Space Invaders\n"
 						+ "and is incompatible with this version.");
 				enemyList.removeAll(enemyList);
+				//Clear any enemies that may have been added to the screen from a half loaded file
 				menuScreen=true;
 				loaded=false;
 				paused=false;
+				//These variables preventthe game from trying to load into the game screen
 				e.printStackTrace();
 			}
 			catch(IOException e){
@@ -900,13 +842,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 										clip.open(ais);
 										clip.start();
 									} catch (UnsupportedAudioFileException e) {
-										// TODO Auto-generated catch block
 										e.printStackTrace();
 									} catch (IOException e) {
-										// TODO Auto-generated catch block
 										e.printStackTrace();
 									} catch (LineUnavailableException e) {
-										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
 									frameCount=0;} if(paused){pauseGame();} break;
@@ -918,8 +857,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 								//If you're on the menu screen, then listen for the 'N' - New game - command
 								placeInvaders(GamePanel.gameWidth,GamePanel.gameHeight);
 								//Then place the invaders (because it's a new game)
-//								placeShelters(GamePanel.gameWidth, GamePanel.gameHeight);
-								//These should only be added when the game starts
 								level=1;
 								//Set the level to 1.... Because it's a new game
 								menuScreen=false;

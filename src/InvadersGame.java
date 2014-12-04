@@ -1,10 +1,10 @@
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Point;
-import java.awt.Toolkit;
+//import java.awt.Cursor;
+//import java.awt.Point;
+//import java.awt.Toolkit;
+//import java.io.File;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -24,9 +24,9 @@ public class InvadersGame extends JFrame  {
 		mp.setSize(width,height);
 		mp.setResizable(false);
 		mp.setTitle("Space Invaders");
-		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+//		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 		//Creates a new transparent image
-		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+//		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
 		//Creates a new cursor with the newly created transparent image
 //		mp.getContentPane().setCursor(blankCursor);
 		//Sets the cursor to be this transparent image when over the JPanel
@@ -34,6 +34,7 @@ public class InvadersGame extends JFrame  {
 		mp.setVisible(true);
 		mp.init();
 		mp.setIconImage(icon);
+		//Sets the app icon to be the martian as defined in .init
 		mp.run();
 
 	}
@@ -51,8 +52,8 @@ public class InvadersGame extends JFrame  {
 		
 		try {
 			icon = ImageIO.read(this.getClass().getResource("/martian.png"));
+			//Loads the image icon
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

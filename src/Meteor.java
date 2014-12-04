@@ -1,5 +1,4 @@
 import java.awt.Graphics;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -60,6 +59,7 @@ public class Meteor extends Enemy{
 	public boolean edgeHit(){
 		if(GamePanel.konamiActive){
 			return true;
+			//This makes all the enemies drop off the screen if a cat hits the edge of the screen
 		}
 		else{
 			return false;
@@ -67,4 +67,5 @@ public class Meteor extends Enemy{
 	}
 	@Override
 	public void dropPosition(){}
+	//Don't drop the meteors when this method is called on the enemyList
 }

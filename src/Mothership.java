@@ -41,13 +41,6 @@ public class Mothership extends Boss implements ShootBack, ActionListener{
 			System.out.println("**CAN'T READ MOTHERSHIP**");
 			e.printStackTrace();
 		}
-//		Iterator<Bullet> iterator = enemyBulletList.iterator();
-//		while (iterator.hasNext()) {
-//		    Bullet b = iterator.next();
-//		    if(b!=null && b.isActive()){
-//		    	b.setImg();
-//		    }
-//		}
 	}
 	
 	@Override
@@ -78,6 +71,8 @@ public class Mothership extends Boss implements ShootBack, ActionListener{
 		}
 	}
 	
+	//This method is to prevent all motherships from shooting at the same time
+	//They always shoot with the same frequency, but not all at the same time
 	public void delayRandomiser(){
 		int iDelay = initialDelay.nextInt(1000);
 		timer = new Timer(2000, this);
@@ -139,7 +134,6 @@ public class Mothership extends Boss implements ShootBack, ActionListener{
 
 	@Override
 	public Point getBulletPosition(int i) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

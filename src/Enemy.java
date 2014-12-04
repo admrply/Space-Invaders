@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 @SuppressWarnings("serial")
 public class Enemy implements Serializable{
 	private int parentWidth;
+	@SuppressWarnings("unused")
 	private int parentHeight;
 	
 	private boolean active = true;
@@ -35,10 +36,12 @@ public class Enemy implements Serializable{
 		if((this instanceof Meteor)&&!GamePanel.konamiActive){
 			this.height = img.getHeight();
 			this.width = img.getWidth();
+			//Makes cats big
 		}
 		else{
 			this.height = img.getHeight()/2;
 			this.width = img.getWidth()/2;
+			//Scales all enemies
 		}
 		
 		//this is the height and width of the game screen, passed through from or main application

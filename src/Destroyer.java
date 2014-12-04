@@ -17,7 +17,6 @@ public class Destroyer extends Boss implements ShootBack, Cloaking, ActionListen
 	
 	private ArrayList<Bullet> enemyBulletList = new ArrayList<Bullet>();
 	private int width;
-	private int height;
 	private int speed = 1;
 	private boolean cloaked = false;
 	Timer shotTimer;
@@ -31,8 +30,6 @@ public class Destroyer extends Boss implements ShootBack, Cloaking, ActionListen
 		lives = 2;
 		setImg();
 		value = 200;
-		this.height = img.getHeight();
-		this.width = img.getWidth();
 		shotTimer = new Timer(random.nextInt(5000)+1000, this);
 //		Creates a random timer somewhere between 1000 and 6000 (1 and 5 seconds)
 		shotTimer.start();
@@ -44,6 +41,7 @@ public class Destroyer extends Boss implements ShootBack, Cloaking, ActionListen
 	
 	@Override
 	public void setImg(){
+		//This is a separate method so it can be called after deserialisation
 		try {
 			img = ImageIO.read(getClass().getResource("/destroyer.png"));
 			System.out.println("**DESTROYER-OK**");
@@ -51,24 +49,21 @@ public class Destroyer extends Boss implements ShootBack, Cloaking, ActionListen
 			System.out.println("***************CAN'T READ FILE*******************");
 			e.printStackTrace();
 		}
-//		Iterator<Bullet> iterator = enemyBulletList.iterator();
-//		while (iterator.hasNext()) {
-//		    Bullet b = iterator.next();
-//		    if(b!=null && b.isActive()){
-//		    	b.setImg();
-//		    }
-//		}
 	}
 
 	@Override
 	public void draw(Graphics g){
 		if(!cloaked){
+			//If it's not cloaked
 			super.draw(g);
+			//Draw the ship
 		}
+		//But if it is cloaked, always allow it to be:
 		if(this.position.x<=0-this.width){
 			this.destroy();
+			//removed when it leaves the screen
 		}
-		
+		//Paused...
 		if(!GamePanel.paused&&shotTimer.isRunning()){}
 		else if(!GamePanel.paused&&!shotTimer.isRunning()){
 			shotTimer.restart();
@@ -76,6 +71,7 @@ public class Destroyer extends Boss implements ShootBack, Cloaking, ActionListen
 		else if(GamePanel.paused){
 			shotTimer.stop();
 		}
+		//And always allow the bullets to be drawn
 		Iterator<Bullet> iterator = enemyBulletList.iterator();
 		while (iterator.hasNext()) {
 		    Bullet b = iterator.next();
@@ -104,16 +100,18 @@ public class Destroyer extends Boss implements ShootBack, Cloaking, ActionListen
 
 	@Override
 	public boolean isCloaked() {
-		// TODO Auto-generated method stub
 		return cloaked;
 	}
 	
 	@Override
 	public boolean edgeHit(){
 		return false;
+		//If edgeHit was the same, all the enemies would immediately drop off the screen because the ship
+		//passes through the edge of the screen
 	}
 	@Override
 	public void dropPosition(){}
+	//Don't allow it to drop in position
 	
 	public int getEnemyBulletCount(){
 		return enemyBulletList.size();
@@ -131,11 +129,12 @@ public class Destroyer extends Boss implements ShootBack, Cloaking, ActionListen
 		if(e.getSource()==shotTimer){
 			shoot();
 			shotTimer.setDelay(random.nextInt(5000)+1000);
-			//(random.nextInt(5000)+1000);
+			//When the shotTimer is fired, change the frequency for the next firing
 		}
 		if(e.getSource()==cloakTimer){
 			changeCloak();
-			cloakTimer.setDelay(random.nextInt(2500)+1000);	
+			cloakTimer.setDelay(random.nextInt(2500)+1000);
+			//Same as above
 		}
 	}
 	
@@ -175,9 +174,9 @@ public class Destroyer extends Boss implements ShootBack, Cloaking, ActionListen
 		}
 	}
 
+	//This will be used for shelter hit detection
 	@Override
 	public Point getBulletPosition(int i) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

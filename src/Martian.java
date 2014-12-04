@@ -11,6 +11,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
+@SuppressWarnings("serial")
 public class Martian extends Invader implements ShootBack, ActionListener{
 	
 	private ArrayList<Bullet> enemyBulletList = new ArrayList<Bullet>();
@@ -77,6 +78,7 @@ public class Martian extends Invader implements ShootBack, ActionListener{
 		timer.start();
 	}
 	
+	//This method loads the bullet images after loading
 	public void replaceBulletImage(){
 		Iterator<Bullet> replaceLoadedImg = enemyBulletList.iterator();
 		while(replaceLoadedImg.hasNext()){
@@ -109,6 +111,7 @@ public class Martian extends Invader implements ShootBack, ActionListener{
 		return enemyBulletList.get(i).getBounds();
 	}
 	
+	//This will be used for shelter hit detection
 	@Override
 	public Point getBulletPosition(int i){
 		return enemyBulletList.get(i).getPosition();
